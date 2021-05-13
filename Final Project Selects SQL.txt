@@ -1,0 +1,89 @@
+-- ------------------------------- SELECTS ---------------------------------
+
+-- 1) Exibir todos os funcionários, ordenado por salário, do maior para o menor
+select * from funcionario order by  salario desc;
+
+-- 2) Exibir o CPF, Nome, Salário e CNH de todos os motoristas. Trocar o nome da coluna nome por motorista.
+select f.cpf,f.nome as motorista, f.salario, m.cnh
+from funcionario f join motorista m on f.codigo=m.codFuncionario;
+
+-- 4) Exibir o Nome, Salario, Login dos secretários e o Nome de cada processador de texto que
+-- ele tem domínio. Usar NomeFunc e NomeProc no resultado da consulta, 
+select f.nome as nomeFunc, f.salario, pt.nome as nomeProc
+from funcionario f join secretaria s on f.codigo=s.codFuncionario
+join processadortextos pt on s.codFuncionario=pt.codSecretaria;
+
+-- 5) Exibir todos os dados dos funcionários não especializados. 
+select * from funcionario
+where tipo='funcionario';
+
+-- 6) INNER JOIN - Liste o nome do funcionario e o nome do projeto dos funcionarios de engenharia
+select p.nome, f.nome
+from engenheiro_participa_projeto epp 
+inner join engenheiro e on epp.codEngenheiro=e.codFuncionario
+inner join projetoengenharia p on  epp.codProjeto=p.codigo 
+inner join funcionario f on e.codFuncionario=f.codigo;
+
+-- 7) LEFT JOIN -
+select f.nome, re.nome
+from funcionario f 
+left join engenheiro e on  e.codFuncionario=f.codigo 
+left join ramoengenharia re on re.codigo = e.ramoengenharia;
+
+-- 8) RIGHT JOIN - Liste o nome do funcionario e o nome do projeto dos funcionarios de engenharia, ate dos que não participam de nenhum projeto
+select p.nome, f.nome
+from engenheiro_participa_projeto epp 
+right join engenheiro e on epp.codEngenheiro=e.codFuncionario
+right join projetoengenharia p on  epp.codProjeto=p.codigo 
+right join funcionario f on e.codFuncionario=f.codigo
+order by p.nome desc;
+
+-- 9) IN - Liste o código, o nome e o codigo do departamento dos funcionarios que estao no departamento 1”
+select nome,codigo,codDepartamento
+from funcionario 
+where codDepartamento in (select codigo from departamento where codigo=1);
+
+-- 10) ANY - Liste o nome e salário dos funcionarios que ganham mais do que alguém do departamento 2”
+select nome,salario
+from funcionario
+where salario> any (select salario from funcionario where salario>2);
+
+-- 11) ALL -Liste o nome e salário dos funcionarios que ganham mais do que todos os empregados do departamento 2”
+select nome,salario, codDepartamento
+from funcionario
+where salario> all (select salario from funcionario where codDepartamento=2);
+
+-- 12) COUNT - quantos funcionarios estão cadastrados no banco
+select count(*) from funcionario;
+
+-- 13) SUM - soma de todos os salários de funcionarios
+select sum(salario) from funcionario;
+
+-- 14) AVG - media de salario dos funcionarios
+select avg(salario) from funcionario;
+
+-- 15 MAX - maior salario
+select max(salario) from funcionario;
+
+-- 16) MIN - menor salario
+select min(salario) from funcionario;
+
+-- 17) Liste os funcionarios que recebem salario acima da média
+SELECT nome, salario
+from funcionario 
+where salario > (select avg(salario) from funcionario);
+
+-- 18) Subconsultas utilizando 2 tabelas - mostre o nome, salario e nome do departmento dos funcionarios
+select f.nome as funcionario, f.salario, d.nome as departamento
+from funcionario f join departamento d on f.codDepartamento=d.codigo;
+
+-- 19) GROUP BY 
+select f.nome, round(avg(f.salario), 2) as media
+from funcionario f
+group by f.nome;
+
+-- 20) HAVING
+select f.nome, round(avg(f.salario), 2) as media
+from funcionario f
+group by f.nome
+having media>6000;
